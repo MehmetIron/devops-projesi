@@ -1,0 +1,45 @@
+---
+- hosts: all
+  tasks:
+  - name: update os
+    yum:
+      name: '*'
+      state: present
+  - name: install docker
+    command: amazon-linux-extras install docker=latest -y
+  - name: start docker
+    service:
+      name: docker
+      state: started
+      enabled: yes
+  - name: add ec2-user to docker group
+    shell: "usermod -a -G docker ec2-user"
+  - name: install docker compose
+    get_url:
+      url: https://github.com/docker/compose/releases/download/1.26.2/docker-compose-Linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      mode: 0775
+
+  - name: copy docker-compose file
+    copy: 
+      src: /home/ec2-user/proje/docker-compose.yaml
+      dest: /home/ec2-user/docker-compose.yaml
+
+  - name: run docker-compose
+    command: "/usr/local/bin/docker-compose -f /home/ec2-user/docker-compose.yaml up -d"
+
+  - name: install nginx
+    yum:
+      name: nginx
+      state: latest
+
+  - name: start nginx
+    shell: "systemctl start nginx"  
+
+  - name: copy redirect.conf file
+    copy: 
+      src: /home/ec2-user/proje/redirect.conf
+      dest: /etc/nginx/conf.d/redirect.conf
+
+  - name: restart nginx
+    shell: "systemctl restart nginx"
