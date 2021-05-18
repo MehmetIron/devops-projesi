@@ -40,7 +40,7 @@ sudo fdisk /dev/sdb
 lsblk
 
 # format the new partitions
-sudo mksf -t ext4 /dev/sdb1
+sudo mkfs -t ext4 /dev/sdb1
 
 # create a mounting point path for new volume
 cd /opt
